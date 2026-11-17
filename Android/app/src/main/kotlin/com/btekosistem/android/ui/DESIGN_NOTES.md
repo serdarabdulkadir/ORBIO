@@ -1,0 +1,12 @@
+# Tasarim ozeti (PULSE / Beats / Galaxy Buds referansli, YALNIZ acik tema)
+- Zemin #ECEFF4; kart beyaz #FFFFFF; dolgu (cip, pasif hap) #F1F3F7; ayrac #E3E7EE. Koyu tema yok: sistem koyu olsa bile acik sema, durum cubugu simgeleri koyu.
+- Vurgu: siyah #0E0F12 (secili cip/hap/dugme/anahtar topuzu, beyaz metin); ikincil metin #5F6672, ucuncul #666C78. Durum: yesil #1E8E3E, kirmizi #D70015.
+- Kose: kart 28dp, cip/hap 20-24dp (tam yuvarlak 50%), kucuk 12dp, alt gezinme 32dp. Kenarlik yok; kartlara ince golge (2dp).
+- Bosluk: 4 tabanli; ekran kenari 16dp, kart ic bosluk 20dp, ogeler arasi 12dp, kartlar arasi 12dp.
+- Tipografi (sistem sans): sayfa basligi 28/Bold, kart basligi 18/Bold, satir basligi 15/SemiBold, govde 15/Normal, aciklama 13/Medium gri, mikro 10-11.
+- Hero: kart ust kenarina tasan vektor TWS kulakliklar (govde radyal gradyan, ozel parlama, silikon uc, mikrofon deligi, LED, zemin golgesi, +-14 derece egim, sag kulaklik onde); baglida nefes/parlama, degilse soluk.
+- Gurultu kontrolu: 3 dilimli DAIRESEL kadran (Gurultu engelleme / Kapali / Seffaf), secili dilim siyah, ortada Ses % ve -/+; seffafta '01 --- 08' hap kaydirici (siyah dolgu, beyaz topuz).
+- Ekolayzer: ikonlu cipler (secili siyah) + 10 bantli noktali grafik (Baseus). Kontroller: 'deger >' satirlari, 'ON (tik)' hap anahtarlar.
+- Alt gezinme: beyaz kapsul, secili sekme siyah hap (beyaz ikon + metin), digerleri yalniz ikon. Mini oynatici: beyaz kart, siyah oynat dugmesi.
+- Hareket: 150-250 ms; Hareketi azalt acikken sabit.
+- AirPods / Beats karti: Apple Proximity Pairing reklamindan (0x004C, tip 0x07) YALNIZ OKUNUR bilgi (model, L/R/kutu pil, sarj simgesi, kulakta/kutuda). Android'de AAP L2CAP kontrol kanali root olmadan guvenilir degil; ANC vb. kontroller bilerek gosterilmez. Birden cok Apple cihazi varsa A2DP/HFP ile bagli cihazla eslesen, sonra RSSI'i en guclu olan secilir (AppleSelector). Tarama BALANCED + pencereli kalir.

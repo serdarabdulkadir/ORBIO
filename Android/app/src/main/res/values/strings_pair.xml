@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pair_code_title">%1$s ile eşleştir</string>
+    <string name="pair_code_body">Mac\'te ORBIO > Ayarlar > Telefon > Telefonu eşle ile üretilen 6 haneli kodu gir.</string>
+    <string name="pair_code_go">Bağlan</string>
+    <string name="pair_code_cancel">Vazgeç</string>
+    <string name="pair_err_need_code">Mac eşleştirme kodu istiyor. Mac\'te ORBIO > Ayarlar > Telefon > Telefonu eşle ile üretilen kodu girin.</string>
+    <string name="pair_err_wrong">Kod yanlış. Mac\'teki kodu kontrol edip tekrar deneyin.</string>
+    <string name="pair_err_locked">Çok sayıda yanlış deneme: Mac eşleştirmeyi kilitledi. Mac\'te yeni kod üretin.</string>
+</resources>

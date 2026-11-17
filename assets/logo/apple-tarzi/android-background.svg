@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="108" height="108">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5AA9FF"/><stop offset="0.5" stop-color="#2A6BF2"/><stop offset="1" stop-color="#1747C9"/></linearGradient>
+<linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.18"/><stop offset="0.45" stop-color="#fff" stop-opacity="0"/></linearGradient>
+<radialGradient id="vg" cx="54" cy="50" r="76" gradientUnits="userSpaceOnUse"><stop offset="0.7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#0A2370" stop-opacity="0.25"/></radialGradient></defs>
+<rect width="108" height="108" fill="url(#bg)"/><rect width="108" height="108" fill="url(#sheen)"/><rect width="108" height="108" fill="url(#vg)"/>
+</svg>

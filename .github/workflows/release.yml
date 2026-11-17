@@ -1,0 +1,117 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  macos:
+    runs-on: macos-15
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+      - name: Package ORBIO.app
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: scripts/paketle.sh --release --version "${{ steps.v.outputs.version }}"
+      - name: Optional DMG
+        run: |
+          hdiutil create -volname ORBIO -srcfolder dist/ORBIO.app -ov -format UDZO "dist/ORBIO-macos-${{ steps.v.outputs.version }}.dmg"
+          (cd dist && shasum -a 256 "ORBIO-macos-${{ steps.v.outputs.version }}.dmg" > "ORBIO-macos-${{ steps.v.outputs.version }}.dmg.sha256")
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: |
+            dist/ORBIO-macos-*.zip
+            dist/ORBIO-macos-*.zip.sha256
+            dist/ORBIO-macos-*.dmg
+            dist/ORBIO-macos-*.dmg.sha256
+
+  android:
+    runs-on: ubuntu-latest
+    outputs:
+      signed: ${{ steps.sign.outputs.signed }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Prepare signing key (if secrets exist)
+        id: sign
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KS_B64" ] && [ -n "$KS_PASS" ] && [ -n "$KEY_ALIAS" ]; then
+            echo "$KS_B64" | base64 --decode > "$RUNNER_TEMP/orbio.keystore"
+            {
+              echo "ORBIO_KEYSTORE=$RUNNER_TEMP/orbio.keystore"
+              echo "ORBIO_KEYSTORE_PASSWORD=$KS_PASS"
+              echo "ORBIO_KEY_ALIAS=$KEY_ALIAS"
+              echo "ORBIO_KEY_PASSWORD=${KEY_PASS:-$KS_PASS}"
+            } >> "$GITHUB_ENV"
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Build release APK
+        working-directory: Android
+        run: |
+          V="${GITHUB_REF_NAME#v}"
+          ./gradlew assembleRelease -PappVersion="$V" -PappVersionCode="$GITHUB_RUN_NUMBER"
+      - name: Collect APK
+        run: |
+          V="${GITHUB_REF_NAME#v}"
+          mkdir -p out
+          APK="$(ls Android/app/build/outputs/apk/release/*.apk | head -n1)"
+          cp "$APK" "out/ORBIO-android-$V.apk"
+          (cd out && sha256sum "ORBIO-android-$V.apk" > "ORBIO-android-$V.apk.sha256")
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: out/*
+
+  publish:
+    needs: [macos, android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+          merge-multiple: true
+      - name: Release notes
+        env:
+          SIGNED: ${{ needs.android.outputs.signed }}
+        run: |
+          {
+            echo "ORBIO ${GITHUB_REF_NAME}"
+            echo
+            echo "See CHANGELOG.md for details."
+            echo
+            echo "- macOS: ad-hoc signed, NOT notarized. Install with install.sh (verifies SHA-256 and clears quarantine) or manually."
+            if [ "$SIGNED" = "true" ]; then
+              echo "- Android: APK signed with the project release key."
+            else
+              echo "- Android: APK signed with a DEBUG key (no release key configured). Updating a build signed with another key requires uninstalling first."
+            fi
+            echo "- Verify downloads with the matching .sha256 files."
+          } > notes.md
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" assets/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "ORBIO $GITHUB_REF_NAME" \
+            --notes-file notes.md \
+            $(case "$GITHUB_REF_NAME" in *-*) echo --prerelease;; esac)

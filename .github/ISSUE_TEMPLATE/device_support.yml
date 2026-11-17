@@ -1,0 +1,35 @@
+name: Device support
+description: Request or report support for an earbud model
+labels: [device-support]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ORBIO only supports devices you own. Do not attach vendor APKs or copyrighted code. Redact serial numbers, MAC addresses and phone numbers.
+  - type: input
+    id: model
+    attributes: {label: Earbud model, placeholder: "QCY MeloBuds Pro / AirPods Pro 2 / ..."}
+    validations: {required: true}
+  - type: input
+    id: firmware
+    attributes: {label: Firmware version}
+  - type: dropdown
+    id: status
+    attributes:
+      label: What are you reporting
+      options: [Model not recognized, Works partly, Works fully (confirmation), Wrong values shown]
+    validations: {required: true}
+  - type: textarea
+    id: bytes
+    attributes:
+      label: Bytes / advertisement data / GATT info
+      description: Raw advertisement data, GATT service UUIDs, or captured frames, and what you did when you captured them (for example "opened lid", "ANC on").
+      render: text
+  - type: textarea
+    id: log
+    attributes:
+      label: Log output
+      render: text
+  - type: textarea
+    id: notes
+    attributes: {label: Anything else}

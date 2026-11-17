@@ -47,3 +47,55 @@ kismen = calisir ama surume bagli, root / ek izin, ya da yalnizca bazi modeller;
 - macOS 27'de CoreBluetooth taramasi 0x004C / tip 0x07 uretici verisini filtrelemeden veriyor mu? (Forumda filtre izlenimi var [15].) Vermiyorsa yedek: sistemin bildirdigi pil degerleri (IOBluetooth / `system_profiler SPBluetoothDataType`).
 - Durum ve sarj baytlarinin bit anlamlari (cevirme / "birincil kulaklik" biti, kulakta bitleri) kendi AirPods'la PacketLogger kaydiyla dogrulanacak; cozucu bunlari "deneysel" isaretler.
 - Kaynaklar arasinda celiski: bazi yazilar tipi 0x07 yerine iki baytlik 0x0220 / 0x2220 olarak okuyor (bu aslinda model alani: 0x2002 vb.). Cozucu tip 0x07 + uzunluk 0x19 + onek 0x01 dizisini esas alir.
+
+---
+
+# Bolum 2 (2026-11-08): Uygun fiyatli TWS kulakliklar (QCY, SoundPEATS, Haylou, Redmi Buds, Soundcore)
+
+Kullanici karari: birincil hedef Android telefon + QCY tarzi TWS kulaklik + Mac. AirPods bolumu (yukarida) ikincil.
+
+## Standart yollar (markadan bagimsiz, once bunlar)
+
+| Bilgi / islev | Yol | Mac | Android | Not |
+|---|---|---|---|---|
+| Kulaklik pili (tek deger) | HFP: kulaklik `AT+XAPL` ile ozelligini bildirir, `AT+IPHONEACCEV` ile pil (0-9) gonderir; cogu ucuz TWS bunu yapar | evet (sistem Bluetooth menusunde gorunen deger; IOBluetooth / `system_profiler SPBluetoothDataType` ile okunur) | evet: `BluetoothDevice.ACTION_BATTERY_LEVEL_CHANGED` yayini + `EXTRA_BATTERY_LEVEL` (gizli API sinirlari surume gore degisir; sistem Ayarlar'da gosterir) | Genelde tek deger (iki kulagin minimumu), kutu pili YOK |
+| Pil (BLE) | GATT Battery Service 0x180F / Battery Level 0x2A19 | evet (CoreBluetooth) | evet | Ucuz TWS'lerde nadir; LE Audio modellerinde daha olasi |
+| Ses seviyesi | AVRCP mutlak ses (Absolute Volume) | sistem | sistem | Uygulamanin ayrica yonetmesi gerekmez |
+| Medya kontrolu | AVRCP oynat / durdur / atla | sistem (MediaRemote ozel; uygulama `NSEvent` medya tuslari) | `MediaSession` | |
+| Kulak algilama | Standart profil YOK; yalnizca marka GATT servisi | hayir (standartla) | kismen (marka protokolu cozulurse) | |
+| ANC / seffaf / EQ / dokunma ayari | Standart profil YOK; marka uygulamasinin ozel BLE GATT servisi ya da RFCOMM / SPP kanali | kismen | kismen | Model basina ayri cozucu gerekir |
+| Paylasimli dinleme / yayin | LE Audio + Auracast (BT 5.2+, LC3) | hayir (macOS yayin sunmuyor) | kismen (Android 13+ ve destekli telefon) | Yeni modellerde (or. BT 6.0) var olabilir, model sayfasindan dogrulanacak |
+| Cift baglanti (multipoint) | Kulaklik firmware ozelligi | - | - | Varsa Mac + telefon ayni anda bagli kalir; "otomatik gecis" icin en kolay yol bu |
+
+## Marka ozel protokoller: acik kaynak durum
+
+| Marka / model | Acik proje | Desteklenenler | Lisans | Kaynak |
+|---|---|---|---|---|
+| QCY MeloBuds N70 (HT18) | OpenQCY-Desktop (Windows, C#) | BLE kontrol kanali tersine muhendislik (ayrinti dogrulanacak) | MIT (listelemeye gore; repo okunarak dogrulanacak) | [16] [17] |
+| Soundcore Liberty 4 NC / 3 Pro, Q30, AeroFit 2 | Gadgetbridge | pil, ANC / seffaf, dokunma eylemleri (EQ yok) | GPL: yalnizca yontem | [18] |
+| Redmi Buds 5 Pro / 6 Pro / 6 Active / 8 Active | Gadgetbridge | pil, firmware, dokunma, EQ on ayarlari | GPL: yalnizca yontem | [19] |
+| Haylou S35 ANC | Gadgetbridge | yuksek destek | GPL: yalnizca yontem | [20] |
+| SoundPEATS, diger QCY modelleri | Bilinen acik proje bulunamadi | - | - | arama sonucu yok |
+| Galaxy Buds / OnePlus Buds (karsilastirma) | GalaxyBudsClient; OnePlus "OPOv1" yazisi | yontem ornegi: ikili akisin yapisini cozme | GPL / blog | [21] [22] |
+
+Sonuc: QCY tarzi kulakliklarda standart yolla **tek pil degeri + medya + ses** kesin; **ANC / EQ / kutu pili / kulak algilama** model basina ozel protokol ister. Strateji: (1) standart yollar her modelde; (2) kullanicinin KENDI modeli icin ozel protokolu pasif kayitla ogrenip ayri "surucu" yazmak; (3) Gadgetbridge'in destekledigi modellerde yontemi ogrenip kendi kodumuzu yazmak.
+
+## Kendi cihazinda protokol ogrenme (pasif, sifreleme kirmadan)
+
+1. **GATT haritasi:** Kulaklik telefona bagliyken nRF Connect (Android) ya da LightBlue (Mac / iOS) ile tara; servis ve karakteristik UUID'lerini, ozelliklerini (read / write / notify) not et. Standart olmayan 128 bit UUID'ler marka servisidir.
+2. **Marka uygulamasinin trafigini kaydet:** Android Gelistirici secenekleri > "Bluetooth HCI snoop gunlugunu etkinlestir" (Etkin / Filtrelenmis degil, tam). Bluetooth'u kapat-ac, marka uygulamasinda TEK bir islem yap (or. ANC ac), zamani not et. Gunlugu `adb bugreport` ile al (`FS/data/misc/bluetooth/logs/btsnoop_hci.log`), Wireshark'ta ac.
+3. **Esle:** Her islem icin yazilan karakteristik + bayt dizisi ve kulakligin bildirdigi (notify) yanit; pil degisimini birkac dakika izleyerek pil alanini bul.
+4. **Sinir:** Sifreli / imzali (MAC, oturum anahtari) gorunen alanlar varsa o model kapsam disi kalir; uretici firmware'i degistirilmez, guncelleme dosyasi indirilip cozulmez.
+5. Kayitlar repoya ham konmaz (cihaz adresi kisisel veri): yalnizca anonimlestirilmis test vektoru (`Tests/.../Vectors`) eklenir.
+
+## Ek kaynaklar
+
+16. OpenQCY-Desktop (Trendshift listelemesi): https://trendshift.io/repositories/195894
+17. QCY MeloBuds N70 / HT18 destek sayfasi: https://www.qcy.com/pages/support-center-ht18
+18. Gadgetbridge, Anker Soundcore: https://gadgetbridge.org/gadgets/headphones/anker
+19. Gadgetbridge, Xiaomi / Redmi: https://gadgetbridge.org/gadgets/headphones/xiaomi
+20. Gadgetbridge, Haylou: https://gadgetbridge.org/gadgets/headphones/haylou/
+21. GalaxyBudsClient: https://github.com/timschneeb/GalaxyBudsClient
+22. "Cracking OPOv1: Reverse Engineering the OnePlus Buds Protocol": https://aasheesh.vercel.app/blog/oneplus-buds
+23. Android BluetoothDevice (ACTION_BATTERY_LEVEL_CHANGED): https://developer.android.com/reference/android/bluetooth/BluetoothDevice
+24. Android HCI snoop log (Bluetooth verbose logging): https://source.android.com/docs/core/connect/bluetooth/verifying_debugging

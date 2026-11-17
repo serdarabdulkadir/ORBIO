@@ -1,0 +1,33 @@
+name: Bug report
+description: Something does not work as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes: {label: What happened, description: "What you expected and what you saw"}
+    validations: {required: true}
+  - type: textarea
+    id: steps
+    attributes: {label: Steps to reproduce}
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options: [macOS app, Android app, Installer (install.sh), Both]
+    validations: {required: true}
+  - type: input
+    id: version
+    attributes: {label: ORBIO version, placeholder: v0.1.0}
+    validations: {required: true}
+  - type: input
+    id: os
+    attributes: {label: "OS version (macOS / Android) and phone or Mac model"}
+  - type: input
+    id: earbuds
+    attributes: {label: Earbuds model and firmware (if relevant)}
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Redact serial numbers, MAC addresses and phone numbers.
+      render: text

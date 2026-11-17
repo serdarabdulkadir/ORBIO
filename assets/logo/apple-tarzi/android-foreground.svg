@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="108" height="108" role="img" aria-label="BT Ekosistem on plan">
+<defs><filter id="af" x="-30%" y="-30%" width="160%" height="170%" color-interpolation-filters="sRGB">
+<feGaussianBlur in="SourceAlpha" stdDeviation="1.25" result="b"/>
+<feOffset in="b" dy="1.43" result="o"/>
+<feFlood flood-color="#0B2C8A" flood-opacity="0.3"/><feComposite in2="o" operator="in" result="drop"/>
+<feOffset in="SourceAlpha" dy="0.29" result="d1"/><feComposite in="SourceAlpha" in2="d1" operator="out" result="topEdge"/>
+<feGaussianBlur in="topEdge" stdDeviation="0.06" result="topB"/>
+<feFlood flood-color="#FFFFFF" flood-opacity="0.85"/><feComposite in2="topB" operator="in" result="hi"/>
+<feOffset in="SourceAlpha" dy="-0.29" result="d2"/><feComposite in="SourceAlpha" in2="d2" operator="out" result="botEdge"/>
+<feGaussianBlur in="botEdge" stdDeviation="0.08" result="botB"/>
+<feFlood flood-color="#0B3AA8" flood-opacity="0.3"/><feComposite in2="botB" operator="in" result="lo"/>
+<feMerge><feMergeNode in="drop"/><feMergeNode in="SourceGraphic"/><feMergeNode in="hi"/><feMergeNode in="lo"/></feMerge></filter><linearGradient id="aL" gradientUnits="userSpaceOnUse" x1="0" y1="33.0" x2="0" y2="75.0"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.8"/><stop offset="1" stop-color="#EAF3FF" stop-opacity="0.56"/></linearGradient>
+<linearGradient id="aR" gradientUnits="userSpaceOnUse" x1="0" y1="33.0" x2="0" y2="75.0"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.97"/><stop offset="1" stop-color="#EAF3FF" stop-opacity="0.84"/></linearGradient>
+<linearGradient id="aS" gradientUnits="userSpaceOnUse" x1="0" y1="33.0" x2="0" y2="75.0"><stop offset="0" stop-color="#fff" stop-opacity="0.30"/><stop offset="0.5" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+<g filter="url(#af)">
+<path d="M44.00 36.67 A20.00 20.00 0 0 0 44.00 71.33" fill="none" stroke="url(#aL)" stroke-width="7.50" stroke-linecap="round"/>
+<path d="M64.00 36.67 A20.00 20.00 0 0 1 64.00 71.33" fill="none" stroke="url(#aR)" stroke-width="7.50" stroke-linecap="round"/>
+<circle cx="54" cy="54" r="5.25" fill="url(#aR)"/>
+</g>
+<g>
+<path d="M44.00 36.67 A20.00 20.00 0 0 0 44.00 71.33" fill="none" stroke="url(#aS)" stroke-width="7.50" stroke-linecap="round"/>
+<path d="M64.00 36.67 A20.00 20.00 0 0 1 64.00 71.33" fill="none" stroke="url(#aS)" stroke-width="7.50" stroke-linecap="round"/>
+<circle cx="54" cy="54" r="5.25" fill="url(#aS)"/></g>
+</svg>

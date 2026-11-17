@@ -1,5 +1,39 @@
+# Swift / Xcode
 .build/
 .swiftpm/
 DerivedData/
 *.xcuserstate
+xcuserdata/
+
+# Android
+Android/build/
+Android/app/build/
+Android/.gradle/
+Android/.kotlin/
+Android/.idea/
+Android/local.properties
+*.keystore
+*.jks
+
+# macOS
 .DS_Store
+
+# Arac / ajan ayarlari
+.claude/
+
+# Gecici ve uretilen ciktilar
+scratch/
+tmp/
+dist/
+*.apk
+*.aab
+*.dmg
+*.zip
+*.sha256
+
+# Kisisel veri ve sirlar
+.env
+.env.*
+*.p12
+*.pem
+secrets/
