@@ -24,7 +24,7 @@ jobs:
         run: |
           hdiutil create -volname ORBIO -srcfolder dist/ORBIO.app -ov -format UDZO "dist/ORBIO-macos-${{ steps.v.outputs.version }}.dmg"
           (cd dist && shasum -a 256 "ORBIO-macos-${{ steps.v.outputs.version }}.dmg" > "ORBIO-macos-${{ steps.v.outputs.version }}.dmg.sha256")
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: macos
           path: |
@@ -76,7 +76,7 @@ jobs:
           APK="$(ls Android/app/build/outputs/apk/release/*.apk | head -n1)"
           cp "$APK" "out/ORBIO-android-$V.apk"
           (cd out && sha256sum "ORBIO-android-$V.apk" > "ORBIO-android-$V.apk.sha256")
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: android
           path: out/*
